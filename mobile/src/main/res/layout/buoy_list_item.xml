@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark">
+
+    <TextView
+        android:id="@+id/buoy_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#283593"
+        android:text="Date"
+        android:textAlignment="center"
+        android:textColor="#FAFAFA"
+        android:textStyle="bold" />
+
+
+    <ImageView
+        android:id="@+id/buoy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/buoy_date"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/fab_margin"
+        android:src="@drawable/buoy_one" />
+
+    <TextView
+        android:id="@+id/buoy_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buoy_date"
+        android:layout_toEndOf="@id/buoy"
+        android:text="Location : "
+        android:textColor="#F5F5F5" />
+
+    <TextView
+        android:id="@+id/text_longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buoy_description"
+        android:layout_toEndOf="@id/buoy"
+        android:text="Longitude : "
+        android:textColor="#F5F5F5" />
+
+    <TextView
+        android:id="@+id/buoy_longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buoy_description"
+        android:layout_toEndOf="@id/text_longitude"
+        android:text="Longitude"
+        android:textColor="#F5F5F5" />
+
+    <TextView
+        android:id="@+id/text_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buoy_longitude"
+        android:layout_toEndOf="@id/buoy"
+        android:text="Latitude : "
+        android:textColor="#F5F5F5" />
+
+    <TextView
+        android:id="@+id/buoy_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_longitude"
+        android:layout_toEndOf="@id/text_latitude"
+        android:text="Latitude"
+        android:textColor="#F5F5F5" />
+
+</RelativeLayout>
