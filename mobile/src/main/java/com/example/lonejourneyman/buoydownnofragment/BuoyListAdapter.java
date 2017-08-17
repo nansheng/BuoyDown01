@@ -1,6 +1,7 @@
 package com.example.lonejourneyman.buoydownnofragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -133,6 +134,12 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
                     + buoyDescriptionView.getText().toString() + " "
                     + buoyLongTextView.getText().toString() + " "
                     + buoyLatTextView.getText().toString());
+
+            Intent detailIntent = new Intent(mContext, DetailActivity.class);
+            detailIntent.putExtra("Description", buoyDescriptionView.getText().toString());
+            detailIntent.putExtra("Longitude", buoyLongTextView.getText().toString());
+            detailIntent.putExtra("Latitude", buoyLatTextView.getText().toString());
+            mContext.startActivity(detailIntent);
         }
     }
 }

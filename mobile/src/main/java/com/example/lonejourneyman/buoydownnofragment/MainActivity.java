@@ -58,15 +58,6 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         mAdapter = new BuoyListAdapter(context);
-
-//        mAdapter = new BuoyListAdapter(context, new BuoyListClickListener() {
-//            @Override
-//            public void onItemClick( View v, int position) {
-//                Log.d(TAG, "clicked position : " + position);
-//            }
-//        });
-
-
         mRecyclerView.setAdapter(mAdapter);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -200,7 +191,7 @@ public class MainActivity extends AppCompatActivity
 
     private void addLocationTask(Location location) {
         ContentValues cv = new ContentValues();
-        cv.put(BuoysContract.BuoysEntry.COLUMN_DESCRIPTION, "Description");
+        cv.put(BuoysContract.BuoysEntry.COLUMN_DESCRIPTION, "-UNKNOWN-");
         cv.put(BuoysContract.BuoysEntry.COLUMN_LONG, location.getLongitude());
         cv.put(BuoysContract.BuoysEntry.COLUMN_LAT, location.getLatitude());
 

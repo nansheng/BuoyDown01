@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/buoy_date"
         android:layout_toEndOf="@id/buoy"
-        android:text="Location : "
+        android:text="-UNKNOWN-"
         android:textColor="#F5F5F5" />
 
     <TextView
