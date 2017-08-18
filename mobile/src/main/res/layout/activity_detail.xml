@@ -10,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight=".3"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical">
-
         <fragment
             android:id="@+id/map"
             class="com.google.android.gms.maps.SupportMapFragment"
@@ -19,27 +20,27 @@
             android:layout_height="match_parent" />
     </LinearLayout>
 
-    <!--
-        <LinearLayout
-            android:id="@+id/buoy_det"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight=".4"
-            android:orientation="vertical">
-    -->
     <RelativeLayout
         android:id="@+id/buoy_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight=".7">
-
-        <TextView
+        <!--
+                <TextView
+                    android:id="@+id/buoy_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Location : "
+                    android:textColor="#F5F5F5" />
+        -->
+        <EditText
             android:id="@+id/buoy_description"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Location : "
+            android:inputType="text|textAutoComplete"
+            android:maxLength="20"
+            android:text="Location"
             android:textColor="#F5F5F5" />
-
 
         <TextView
             android:id="@+id/text_latitude"
@@ -63,16 +64,41 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/text_latitude"
+            android:scrollHorizontally="false"
             android:text="Address :"
             android:textColor="#F5F5F5" />
 
         <TextView
+            android:id="@+id/text_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/text_description"
+            android:layout_alignBottom="@+id/text_description"
+            android:layout_alignParentStart="true"
+            android:scrollHorizontally="false"
+            android:text="Description :  "
+            android:textColor="#F5F5F5" />
+
+        <EditText
             android:id="@+id/text_description"
+            style="@style/TextAppearance.AppCompat.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/text_address"
-            android:text="Description :"
+            android:layout_toEndOf="@+id/text_details"
+            android:inputType="textMultiLine|textAutoComplete"
+            android:maxLength="60"
+            android:text="Description"
             android:textColor="#F5F5F5" />
+        <!--
+                <TextView
+                    android:id="@+id/text_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_address"
+                    android:text="Description :"
+                    android:textColor="#F5F5F5" />
+        -->
 
     </RelativeLayout>
     <!--

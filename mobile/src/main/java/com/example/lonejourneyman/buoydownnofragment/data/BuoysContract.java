@@ -22,6 +22,7 @@ public class BuoysContract {
 
         public static final String TABLE_NAME = "buoyslist";
         public static final String COLUMN_DESCRIPTION = "buoyDescription";
+        public static final String COLUMN_DETAILS = "buoyDetails";
         public static final String COLUMN_LONG = "buoyLongitude";
         public static final String COLUMN_LAT = "buoyLatitude";
         public static final String COLUMN_TIMESTAMP = "buoyTimestamp";

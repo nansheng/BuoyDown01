@@ -27,7 +27,6 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
 
     private Cursor mCursor;
     private Context mContext;
-    //private BuoyListClickListener mListener;
 
     public BuoyListAdapter(Context context) {
         this.mContext = context;
@@ -40,19 +39,6 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.buoy_list_item, parent, false);
 
-        //final BuoyListHolder mListHolder = new BuoyListHolder(view);
-        //mListHolder.getLayoutPosition();
-//        view.setOnClickListener(new View.OnClickListener() {
-        //          @Override
-        //        public void onClick(View v) {
-//
-        //int listPosition = mListHolder.getPosition();
-        //              Log.d(TAG, "List Position = " + mCursor.getColumnCount());
-
-        //mListener.onItemClick(v, mListHolder.getPosition());
-        //        }
-        //  });
-
         return new BuoyListHolder(view);
     }
 
@@ -63,6 +49,7 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
 
         int idIndex = mCursor.getColumnIndex(BuoysContract.BuoysEntry._ID);
         String description = mCursor.getString(mCursor.getColumnIndex(BuoysContract.BuoysEntry.COLUMN_DESCRIPTION));
+        String details = mCursor.getString(mCursor.getColumnIndex(BuoysContract.BuoysEntry.COLUMN_DETAILS));
         String longitude = mCursor.getString(mCursor.getColumnIndex(BuoysContract.BuoysEntry.COLUMN_LONG));
         String latitude = mCursor.getString(mCursor.getColumnIndex(BuoysContract.BuoysEntry.COLUMN_LAT));
         String timeStamp = mCursor.getString(mCursor.getColumnIndex(BuoysContract.BuoysEntry.COLUMN_TIMESTAMP));
@@ -84,7 +71,9 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
         //holder.buoyDate.setText(timeStamp);
         //holder.buoyDate.setVisibility(View.GONE);
 
+        holder.buoyIndex.setText(String.valueOf(id));
         holder.buoyDescriptionView.setText(description);
+        holder.buoyDetailsView.setText(details);
         holder.buoyLongTextView.setText(longitude);
         holder.buoyLatTextView.setText(latitude);
     }
@@ -112,8 +101,10 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
 
     class BuoyListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        TextView buoyIndex;
         TextView buoyDate;
         TextView buoyDescriptionView;
+        TextView buoyDetailsView;
         TextView buoyLongTextView;
         TextView buoyLatTextView;
 
@@ -122,8 +113,10 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
 
             itemView.setOnClickListener(this);
 
+            buoyIndex = (TextView) itemView.findViewById(R.id.database_index);
             buoyDate = (TextView) itemView.findViewById(R.id.buoy_date);
             buoyDescriptionView = (TextView) itemView.findViewById(R.id.buoy_description);
+            buoyDetailsView = (TextView) itemView.findViewById(R.id.database_details);
             buoyLongTextView = (TextView) itemView.findViewById(R.id.buoy_longitude);
             buoyLatTextView = (TextView) itemView.findViewById(R.id.buoy_latitude);
         }
@@ -136,7 +129,9 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
                     + buoyLatTextView.getText().toString());
 
             Intent detailIntent = new Intent(mContext, DetailActivity.class);
+            detailIntent.putExtra("DatabaseIndex", buoyIndex.getText().toString());
             detailIntent.putExtra("Description", buoyDescriptionView.getText().toString());
+            detailIntent.putExtra("DatabaseDetails", buoyDetailsView.getText().toString());
             detailIntent.putExtra("Longitude", buoyLongTextView.getText().toString());
             detailIntent.putExtra("Latitude", buoyLatTextView.getText().toString());
             mContext.startActivity(detailIntent);

@@ -1,6 +1,7 @@
 package com.example.lonejourneyman.buoydownnofragment;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity
                 .build();
 
         initialAwarenessTask();
+
     }
 
     private void initialAwarenessTask() {
@@ -191,7 +194,8 @@ public class MainActivity extends AppCompatActivity
 
     private void addLocationTask(Location location) {
         ContentValues cv = new ContentValues();
-        cv.put(BuoysContract.BuoysEntry.COLUMN_DESCRIPTION, "-UNKNOWN-");
+        cv.put(BuoysContract.BuoysEntry.COLUMN_DESCRIPTION, "#TBD");
+        cv.put(BuoysContract.BuoysEntry.COLUMN_DETAILS, "#DETAILS");
         cv.put(BuoysContract.BuoysEntry.COLUMN_LONG, location.getLongitude());
         cv.put(BuoysContract.BuoysEntry.COLUMN_LAT, location.getLatitude());
 
@@ -199,6 +203,16 @@ public class MainActivity extends AppCompatActivity
         if (uri != null) {
             //Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
             getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
+            // notification test
+            NotificationCompat.Builder mBuilder =
+                    (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.buoy_one)
+                            .setContentTitle("BUOY DOWN! Notification")
+                            .setContentText("New Location Saved!");
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotifyMgr.notify(001, mBuilder.build());
         }
     }
 

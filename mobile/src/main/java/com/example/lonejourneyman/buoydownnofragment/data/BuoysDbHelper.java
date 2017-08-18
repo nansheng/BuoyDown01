@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class BuoysDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "buoyslist.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public BuoysDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,6 +23,7 @@ public class BuoysDbHelper extends SQLiteOpenHelper {
                 BuoysContract.BuoysEntry.TABLE_NAME + " (" +
                 BuoysContract.BuoysEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 BuoysContract.BuoysEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
+                BuoysContract.BuoysEntry.COLUMN_DETAILS + " TEXT NOT NULL, " +
                 BuoysContract.BuoysEntry.COLUMN_LONG + " DOUBLE NOT NULL, " +
                 BuoysContract.BuoysEntry.COLUMN_LAT + " DOUBLE NOT NULL, " +
                 BuoysContract.BuoysEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +

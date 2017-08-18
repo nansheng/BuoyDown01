@@ -15,7 +15,6 @@
         android:textColor="#FAFAFA"
         android:textStyle="bold" />
 
-
     <ImageView
         android:id="@+id/buoy"
         android:layout_width="wrap_content"
@@ -25,6 +24,18 @@
         android:layout_centerVertical="true"
         android:padding="@dimen/fab_margin"
         android:src="@drawable/buoy_one" />
+
+    <TextView
+        android:id="@+id/database_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/database_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/buoy_description"
