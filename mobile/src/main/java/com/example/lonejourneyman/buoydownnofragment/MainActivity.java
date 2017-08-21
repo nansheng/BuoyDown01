@@ -4,12 +4,15 @@ import android.Manifest;
 import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -41,11 +44,12 @@ public class MainActivity extends AppCompatActivity
 
     private static final int TASK_LOADER_ID = 0;
     private static final int MY_PERMISSION_LOCATION = 1;
+    private static GoogleApiClient mApiClient;
     TextView mLocationDisplayText;
     RecyclerView mRecyclerView;
     private String TAG = getClass().getSimpleName();
-    private GoogleApiClient mApiClient;
     private BuoyListAdapter mAdapter;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +112,11 @@ public class MainActivity extends AppCompatActivity
                 })
                 .build();
 
-        initialAwarenessTask();
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean("autosave_switch", true)) {
+            initialAwarenessTask();
+        }
+
 
     }
 
@@ -204,15 +212,17 @@ public class MainActivity extends AppCompatActivity
             //Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
             getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
 
-            // notification test
-            NotificationCompat.Builder mBuilder =
-                    (NotificationCompat.Builder) new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.buoy_one)
-                            .setContentTitle("BUOY DOWN! Notification")
-                            .setContentText("New Location Saved!");
-            NotificationManager mNotifyMgr =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            mNotifyMgr.notify(001, mBuilder.build());
+            // notification
+            if (prefs.getBoolean("send_notification", true)) {
+                NotificationCompat.Builder mBuilder =
+                        (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                                .setSmallIcon(R.drawable.buoy_one)
+                                .setContentTitle("BUOY DOWN! Notification")
+                                .setContentText("New Location Saved!");
+                NotificationManager mNotifyMgr =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotifyMgr.notify(001, mBuilder.build());
+            }
         }
     }
 
@@ -255,11 +265,12 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -272,4 +283,13 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
     }
+
+    public class AwarenessQTask extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... params) {
+            getLocationSnapshot();
+            return null;
+        }
+    }
+
 }
