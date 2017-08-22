@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.lonejourneyman.buoydownnofragment">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Google Cloud -->
+
+
     <!-- Weather snapshots depend on this permission -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Activity recognition requires its own permission -->
@@ -26,36 +32,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <meta-data
-            android:name="com.google.android.awareness.API_KEY"
-            android:value="" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="" />
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
-
-        <provider
-            android:name=".data.BuoysContentProvider"
-            android:authorities="com.example.lonejourneyman.buoydownnofragment"
-            android:exported="false" />
-
-        <service android:name=".BuoyDownMessagingService" />
-        <service android:name=".QuickAddIntent" />
-
-        <receiver android:name=".MessageReadReceiver">
-            <intent-filter>
-                <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_READ" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".MessageReplyReceiver">
-            <intent-filter>
-                <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_REPLY" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".DetailActivity"
             android:label="Details"
@@ -76,30 +52,58 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <provider
+            android:name=".data.BuoysContentProvider"
+            android:authorities="com.example.lonejourneyman.buoydownnofragment"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.awareness.API_KEY"
+            android:value="" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="" />
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
+        <receiver android:name=".MessageReadReceiver">
+            <intent-filter>
+                <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_READ" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".MessageReplyReceiver">
+            <intent-filter>
+                <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_REPLY" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".BuoyDownMessagingService" />
+
         <receiver android:name=".QuickAddWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_DATA_UPDATED" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/quick_add_widget_info" />
         </receiver>
+        <service android:name=".QuickAddIntent" />
+
         <receiver android:name=".ListBuoyWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_DATA_UPDATED" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/list_buoy_widget_info" />
         </receiver>
-
         <service
             android:name=".BuoyListIntent"
             android:enabled="true"
-            android:exported="true"></service>
-    </application>
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
+    </application>
 </manifest>

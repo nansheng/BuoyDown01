@@ -17,27 +17,19 @@ import java.util.TimeZone;
 
 public class BuoyListIntent extends RemoteViewsService {
 
+    public final String TAG = BuoyListIntent.class.getSimpleName();
+
     static final int INDEX_BUOY_ID = 0;
     static final int INDEX_BUOY_DESC = 1;
     static final int INDEX_BUOY_DETAIL = 2;
     static final int INDEX_BUOY_LONG = 3;
     static final int INDEX_BUOY_LAT = 4;
     static final int INDEX_BUOY_TIMESTAMP = 5;
-    private static final String[] BUOY_COLUMNS = {
-            BuoysContract.BuoysEntry.TABLE_NAME + "." + BuoysContract.BuoysEntry._ID,
-            BuoysContract.BuoysEntry.COLUMN_DESCRIPTION,
-            BuoysContract.BuoysEntry.COLUMN_DETAILS,
-            BuoysContract.BuoysEntry.COLUMN_LONG,
-            BuoysContract.BuoysEntry.COLUMN_LAT,
-            BuoysContract.BuoysEntry.COLUMN_TIMESTAMP
-    };
-    public final String TAG = BuoyListIntent.class.getSimpleName();
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new RemoteViewsFactory() {
             private Cursor data = null;
-
 
             @Override
             public void onCreate() {
@@ -55,7 +47,7 @@ public class BuoyListIntent extends RemoteViewsService {
                         null,
                         null,
                         null,
-                        BuoysContract.BuoysEntry.COLUMN_TIMESTAMP + "DESC");
+                        BuoysContract.BuoysEntry.COLUMN_TIMESTAMP + " DESC");
                 Binder.restoreCallingIdentity(identityToken);
             }
 
@@ -88,7 +80,6 @@ public class BuoyListIntent extends RemoteViewsService {
                 inputSDF.setTimeZone(TimeZone.getTimeZone("UTC"));
                 try {
                     Date myDate = inputSDF.parse(buoyDate);
-                    //SimpleDateFormat outputSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     SimpleDateFormat outputSDF = new SimpleDateFormat("EEEE  MMM dd, yyyy  HH:mm a");
                     buoyDate = outputSDF.format(myDate);
                 } catch (ParseException e) {
@@ -101,8 +92,16 @@ public class BuoyListIntent extends RemoteViewsService {
 
                 views.setTextViewText(R.id.widget_buoy_date, buoyDate);
                 views.setTextViewText(R.id.widget_buoy_description, buoyDescription);
-                views.setTextViewText(R.id.widget_buoy_latitude, buoyLat);
-                views.setTextViewText(R.id.widget_buoy_longitude, buoyLong);
+                views.setTextViewText(R.id.widget_buoy_longlat,
+                        "Lat :  " + buoyLat + "    Long :  " + buoyLong);
+
+                final Intent fillInIntent = new Intent();
+                fillInIntent.putExtra("DatabaseIndex", data.getString(INDEX_BUOY_ID));
+                fillInIntent.putExtra("Description", buoyDescription);
+                fillInIntent.putExtra("DatabaseDetails", data.getString(INDEX_BUOY_DETAIL));
+                fillInIntent.putExtra("Longitude", buoyLong);
+                fillInIntent.putExtra("Latitude", buoyLat);
+                views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 
                 return views;
             }

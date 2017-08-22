@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimaryDark">
-
     <TextView
         android:id="@+id/widget_buoy_date"
         android:layout_width="match_parent"
@@ -13,47 +13,18 @@
         android:textAlignment="center"
         android:textColor="#FAFAFA"
         android:textStyle="bold" />
-
     <TextView
         android:id="@+id/widget_buoy_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/buoy_date"
-        android:layout_toEndOf="@id/buoy"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/widget_buoy_date"
         android:textColor="#F5F5F5" />
-
     <TextView
-        android:id="@+id/widget_text_longitude"
+        android:id="@+id/widget_buoy_longlat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/buoy_description"
-        android:layout_toEndOf="@id/buoy"
-        android:text="Longitude : "
+        android:layout_centerInParent="true"
+        android:layout_below="@id/widget_buoy_description"
         android:textColor="#F5F5F5" />
-
-    <TextView
-        android:id="@+id/widget_buoy_longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buoy_description"
-        android:layout_toEndOf="@id/text_longitude"
-        android:textColor="#F5F5F5" />
-
-    <TextView
-        android:id="@+id/widget_text_latitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buoy_longitude"
-        android:layout_toEndOf="@id/buoy"
-        android:text="Latitude : "
-        android:textColor="#F5F5F5" />
-
-    <TextView
-        android:id="@+id/widget_buoy_latitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/text_longitude"
-        android:layout_toEndOf="@id/text_latitude"
-        android:textColor="#F5F5F5" />
-
 </RelativeLayout>

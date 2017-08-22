@@ -123,9 +123,10 @@ public class QuickAddIntent extends IntentService {
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotifyMgr.notify(003, mBuilder.build());
             }
-
-            Intent dataUpdaetadIntent = new Intent(ACTION_DATA_UPDATED);
-            getApplicationContext().sendBroadcast(dataUpdaetadIntent);
+            // Updating widget
+            Intent dataUpdatadIntent = new Intent(ACTION_DATA_UPDATED)
+                    .setPackage(this.getPackageName());
+            this.sendBroadcast(dataUpdatadIntent);
         }
     }
 }

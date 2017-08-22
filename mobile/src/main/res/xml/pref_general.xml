@@ -12,6 +12,13 @@
         android:summary="@string/pref_description_send_notification"
         android:title="@string/pref_title_send_notification" />
 
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/sort_entries"
+        android:entryValues="@array/sort_values"
+        android:key="@string/pref_sort_key"
+        android:summary="Date"
+        android:title="@string/pref_sort_buoy_list" />
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code.

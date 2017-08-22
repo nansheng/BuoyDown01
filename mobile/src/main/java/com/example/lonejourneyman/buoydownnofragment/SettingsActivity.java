@@ -13,6 +13,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.List;
@@ -45,15 +46,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
-                //ListPreference listPreference = (ListPreference) preference;
-                //int index = listPreference.findIndexOfValue(stringValue);
-
+                ListPreference listPreference = (ListPreference) preference;
+                int index = listPreference.findIndexOfValue(stringValue);
                 // Set the summary to reflect the new value.
-                //preference.setSummary(
-                //        index >= 0
-                //                ? listPreference.getEntries()[index]
-                //                : null);
-
+                preference.setSummary(
+                        index >= 0
+                                ? listPreference.getEntries()[index]
+                                : null);
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
                 // using RingtoneManager.
@@ -201,7 +200,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            //bindPreferenceSummaryToValue(findPreference("example_text"));
+            bindPreferenceSummaryToValue(findPreference("Sorting"));
             //bindPreferenceSummaryToValue(findPreference("example_list"));
         }
 

@@ -12,6 +12,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +33,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.lonejourneyman.buoydownnofragment.data.BuoysContract;
@@ -40,16 +44,24 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 
 public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements ActivityCompat.OnRequestPermissionsResultCallback,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final String ACTION_DATA_UPDATED =
+            "com.example.lonejourneyman.buoydownnofragment.ACTION_DATA_UPDATED";
     private static final int TASK_LOADER_ID = 0;
+    private static final int TASK_SEARCH_ID = 1;
     private static final int MY_PERMISSION_LOCATION = 1;
     private static GoogleApiClient mApiClient;
-    TextView mLocationDisplayText;
+//    TextView mLocationDisplayText;
     RecyclerView mRecyclerView;
     private String TAG = getClass().getSimpleName();
     private BuoyListAdapter mAdapter;
     private SharedPreferences prefs;
+
+    Boolean initialCountdown = true;
+    CountDownTimer triggerCountdown;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +78,8 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new BuoyListAdapter(context);
         mRecyclerView.setAdapter(mAdapter);
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -81,11 +95,17 @@ public class MainActivity extends AppCompatActivity
                 uri = uri.buildUpon().appendPath(stringId).build();
 
                 getContentResolver().delete(uri, null, null);
+
                 getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
+                // Updating widget
+                Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                        .setPackage(context.getPackageName());
+                context.sendBroadcast(dataUpdatedIntent);
+
+
             }
         }).attachToRecyclerView(mRecyclerView);
-
-        //mLocationDisplayText = (TextView) findViewById(R.id.location_display);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_content_add);
@@ -112,7 +132,6 @@ public class MainActivity extends AppCompatActivity
                 })
                 .build();
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (prefs.getBoolean("autosave_switch", true)) {
             initialAwarenessTask();
         }
@@ -127,11 +146,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
+        getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
 
         return new AsyncTaskLoader<Cursor>(this) {
 
@@ -148,12 +168,23 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public Cursor loadInBackground() {
+
+                String sortString = (prefs.getString("Sorting", "Shit").equals("0"))
+                        ? BuoysContract.BuoysEntry.COLUMN_TIMESTAMP + " DESC" :
+                        BuoysContract.BuoysEntry.COLUMN_DESCRIPTION + " ASC";
+
+                String buoySelection = null;
+                if (id == 1)
+                buoySelection = (args.getString("query").isEmpty()) ? null :
+                        BuoysContract.BuoysEntry.COLUMN_DESCRIPTION +
+                        " LIKE '%" + args.getString("query") + "%'";
+
                 try {
                     return getContentResolver().query(BuoysContract.BuoysEntry.CONTENT_URI,
                             null,
+                            buoySelection,
                             null,
-                            null,
-                            BuoysContract.BuoysEntry.COLUMN_TIMESTAMP + " DESC");
+                            sortString);
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to asynchronously load location data.");
                     e.printStackTrace();
@@ -209,7 +240,7 @@ public class MainActivity extends AppCompatActivity
 
         Uri uri = getContentResolver().insert(BuoysContract.BuoysEntry.CONTENT_URI, cv);
         if (uri != null) {
-            //Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+
             getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
 
             // notification
@@ -222,6 +253,10 @@ public class MainActivity extends AppCompatActivity
                 NotificationManager mNotifyMgr =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotifyMgr.notify(001, mBuilder.build());
+                // Updating widget
+                Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                        .setPackage(this.getPackageName());
+                this.sendBroadcast(dataUpdatedIntent);
             }
         }
     }
@@ -247,14 +282,54 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void searchBuoys(String query) {
+        Bundle qBundle = new Bundle();
+        qBundle.putString("query",query);
+
+        getSupportLoaderManager().restartLoader(TASK_SEARCH_ID, qBundle, MainActivity.this);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu);
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-//        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-//        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchBuoys(query);
+                searchView.clearFocus();
+                //searchView.setQuery("", false);
+                //searchView.setIconified(true);
+                searchItem.collapseActionView();
+                Log.d(TAG, "NOW WE HARE TALKING");
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+                if (!initialCountdown) {
+                    triggerCountdown.cancel();
+                }
+                triggerCountdown = new CountDownTimer(2000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                    }
+                    @Override
+                    public void onFinish() {
+                        searchBuoys(newText);
+                    }
+                };
+                triggerCountdown.start();
+                initialCountdown = false;
+                return false;
+            }
+        });
 
         return true;
     }
@@ -283,13 +358,4 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
     }
-
-    public class AwarenessQTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected String doInBackground(Void... params) {
-            getLocationSnapshot();
-            return null;
-        }
-    }
-
 }

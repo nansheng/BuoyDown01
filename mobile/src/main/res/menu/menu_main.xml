@@ -7,15 +7,22 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_action_search"
-        android:title="Search"
-        app:showAsAction="ifRoom|collapseActionView" />
+        android:title="@string/search_magnifier"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
 
+
+    <!--
+    app:showAsAction="ifRoom|collapseActionView" />
     <item
         android:id="@+id/action_voice"
         android:icon="@drawable/ic_action_mic"
-        android:title="Voice"
+        android:title="@string/search_voice"
+        app:actionViewClass="android.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
+    -->
 </menu>
