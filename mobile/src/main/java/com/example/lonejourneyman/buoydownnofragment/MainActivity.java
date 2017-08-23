@@ -2,12 +2,14 @@ package com.example.lonejourneyman.buoydownnofragment;
 
 import android.Manifest;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,6 +21,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -35,13 +39,16 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import com.example.lonejourneyman.buoydownnofragment.data.BuoysContract;
+
 import com.google.android.gms.awareness.Awareness;
 import com.google.android.gms.awareness.snapshot.LocationResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback,
@@ -53,8 +60,7 @@ public class MainActivity extends AppCompatActivity
     private static final int TASK_SEARCH_ID = 1;
     private static final int MY_PERMISSION_LOCATION = 1;
     private static GoogleApiClient mApiClient;
-//    TextView mLocationDisplayText;
-    RecyclerView mRecyclerView;
+    //RecyclerView mRecyclerView;
     private String TAG = getClass().getSimpleName();
     private BuoyListAdapter mAdapter;
     private SharedPreferences prefs;
@@ -62,6 +68,9 @@ public class MainActivity extends AppCompatActivity
     Boolean initialCountdown = true;
     CountDownTimer triggerCountdown;
 
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.all_buoy_list_view) RecyclerView mRecyclerView;
+    @BindView(R.id.fab) FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,23 +78,22 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         final Context context = this;
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        ButterKnife.bind(this);
+
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.all_buoy_list_view);
+        //mRecyclerView = (RecyclerView) findViewById(R.id.all_buoy_list_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         mAdapter = new BuoyListAdapter(context);
         mRecyclerView.setAdapter(mAdapter);
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
             }
-
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int id = (int) viewHolder.itemView.getTag();
@@ -102,12 +110,10 @@ public class MainActivity extends AppCompatActivity
                 Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
                         .setPackage(context.getPackageName());
                 context.sendBroadcast(dataUpdatedIntent);
-
-
             }
         }).attachToRecyclerView(mRecyclerView);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_content_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +130,6 @@ public class MainActivity extends AppCompatActivity
                     public void onConnected(@Nullable Bundle bundle) {
                         Log.i(TAG, "Google API Client is connected");
                     }
-
                     @Override
                     public void onConnectionSuspended(int i) {
                         Log.i(TAG, "Google API Client is suspended!");
@@ -135,8 +140,6 @@ public class MainActivity extends AppCompatActivity
         if (prefs.getBoolean("autosave_switch", true)) {
             initialAwarenessTask();
         }
-
-
     }
 
     private void initialAwarenessTask() {
@@ -147,7 +150,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
-
     }
 
     @Override
@@ -221,8 +223,8 @@ public class MainActivity extends AppCompatActivity
                                 return;
                             }
                             Location location = locationResult.getLocation();
-                            Log.i(TAG, "Lat: " + location.getLatitude() +
-                                    ", Lng: " + location.getLongitude());
+                            //Log.d(TAG, "Lat: " + location.getLatitude() +
+                            //        ", Lng: " + location.getLongitude());
                             addLocationTask(location);
                         }
                     });
@@ -245,14 +247,56 @@ public class MainActivity extends AppCompatActivity
 
             // notification
             if (prefs.getBoolean("send_notification", true)) {
+
+                //Setting for Auto Messaging when Read
+                int thisConversationId = 6;
+                Intent msgHeardIntent = new Intent()
+                        .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+                        .setAction("com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_READ")
+                        .putExtra("conversation_id", thisConversationId);
+                PendingIntent msgHeardPendingIntent =
+                        PendingIntent.getBroadcast(getApplicationContext(), thisConversationId,
+                                msgHeardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                //Setting for Auto Messaging when Reply
+                Intent msgReplyIntent = new Intent()
+                        .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+                        .setAction("com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_REPLY")
+                        .putExtra("conversation_id", thisConversationId);
+                PendingIntent msgReplyPendingIntent =
+                        PendingIntent.getBroadcast(getApplicationContext(), thisConversationId,
+                                msgReplyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                //Auto Remote
+                RemoteInput remoteInput = new RemoteInput.Builder("voice_reply_key")
+                        .setLabel("Prompt text")
+                        .build();
+                //Auto Conversation
+                String conversationName = "BUOY DOWN";
+                NotificationCompat.CarExtender.UnreadConversation.Builder unreadConvBuild =
+                        new android.support.v4.app.NotificationCompat.CarExtender.UnreadConversation.Builder(
+                                conversationName)
+                        .setReadPendingIntent(msgHeardPendingIntent)
+                        .setReplyAction(msgReplyPendingIntent, remoteInput);
+                unreadConvBuild.addMessage("New Location Saved!")
+                        .setLatestTimestamp(System.currentTimeMillis());
+
                 NotificationCompat.Builder mBuilder =
                         (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                                 .setSmallIcon(R.drawable.buoy_one)
                                 .setContentTitle("BUOY DOWN! Notification")
-                                .setContentText("New Location Saved!");
-                NotificationManager mNotifyMgr =
-                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                                .setContentText("New Location Saved!")
+                                .setAutoCancel(true)
+                                .extend(new android.support.v4.app.NotificationCompat.CarExtender()
+                                        .setUnreadConversation(unreadConvBuild.build()));
+                //.setContentIntent(pendingIntent); when user click on the notificasitaon
+                //.setLargeIcon(Bitmap.... - large left icon
+                //.setSubText(String)
+
+//                NotificationManager mNotifyMgr =
+//                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                NotificationManagerCompat mNotifyMgr =
+                        NotificationManagerCompat.from(getApplicationContext());
                 mNotifyMgr.notify(001, mBuilder.build());
+
                 // Updating widget
                 Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
                         .setPackage(this.getPackageName());
@@ -307,7 +351,6 @@ public class MainActivity extends AppCompatActivity
                 //searchView.setQuery("", false);
                 //searchView.setIconified(true);
                 searchItem.collapseActionView();
-                Log.d(TAG, "NOW WE HARE TALKING");
                 return false;
             }
 

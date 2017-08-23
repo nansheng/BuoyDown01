@@ -2,17 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.lonejourneyman.buoydownnofragment">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Google Cloud -->
-
-
-    <!-- Weather snapshots depend on this permission -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- Activity recognition requires its own permission -->
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
-    <uses-permission android:name="com.google.android.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -59,14 +55,14 @@
 
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
-            android:value="" />
+            android:value="AIzaSyCUC1JkAJgB11HXNIh9qcMUxamk5_dt4DE" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="" />
+            android:value="AIzaSyC3VdtiYkgndcM0DFr0qgCBk2lahaIjjHk" />
+
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
-
         <receiver android:name=".MessageReadReceiver">
             <intent-filter>
                 <action android:name="com.example.lonejourneyman.buoydownnofragment.ACTION_MESSAGE_READ" />

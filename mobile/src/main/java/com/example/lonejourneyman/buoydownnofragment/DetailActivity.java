@@ -27,7 +27,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class DetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private String TAG = getClass().getSimpleName();
 
     BuoysDbHelper mBuoysDbHelper;
     String detailIndex;
@@ -35,24 +40,27 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
     String detailDetails;
     String detailLong;
     String detailLat;
+    String[] detailDate;
     LatLng detailLoc;
-    EditText editTitle;
-    EditText editDescription;
     SQLiteDatabase db;
     Boolean initialCountdown = true;
     CountDownTimer triggerCountdown;
-    private String TAG = getClass().getSimpleName();
+
+    @BindView(R.id.buoy_description) EditText editTitle;
+    @BindView(R.id.text_description) EditText editDescription;
+    @BindView(R.id.text_latitude) TextView detLat;
+    @BindView(R.id.text_longitude) TextView detLong;
+    @BindView(R.id.text_address) TextView detTitle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        ButterKnife.bind(this);
 
         mBuoysDbHelper = new BuoysDbHelper(getBaseContext());
         db = mBuoysDbHelper.getWritableDatabase();
-
-//        Uri uri = BuoysContract.BuoysEntry.CONTENT_URI;
-//        uri = uri.buildUpon().appendPath(detailIndex).build();
 
         Intent intent = getIntent();
         detailIndex = intent.getStringExtra("DatabaseIndex");
@@ -60,16 +68,23 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         detailDetails = intent.getStringExtra("DatabaseDetails");
         detailLong = intent.getStringExtra("Longitude");
         detailLat = intent.getStringExtra("Latitude");
+        detailDate = intent.getStringExtra("Date").split(" ");
+
+        setTitle(
+                detailDate[1] + " " +
+                detailDate[2] + " " +
+                detailDate[3] + " " +
+                detailDate[4] + " " +
+                detailDate[5] + " " +
+                detailDate[6] + " " +
+                detailDate[7]);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().
                 findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        editTitle = (EditText) findViewById(R.id.buoy_description);
         editTitle.setText(detailDesc);
         editTitle.addTextChangedListener(new GenericTextWatcher(editTitle));
-
-        editDescription = (EditText) findViewById(R.id.text_description);
         editDescription.setText(detailDetails);
         editDescription.addTextChangedListener(new GenericTextWatcher(editDescription));
 
@@ -86,19 +101,13 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                 String detCountry = address.get(0).getCountryName();
                 String detPostal = address.get(0).getPostalCode();
 
-                Log.d(TAG, "ADD : " + detailIndex);
-
-                TextView detLat = (TextView) findViewById(R.id.text_latitude);
                 detLat.setText("Latitude :  " + detailLat + "                ");
-                TextView detLong = (TextView) findViewById(R.id.text_longitude);
                 detLong.setText("Longitude :  " + detailLong);
-                TextView detTitle = (TextView) findViewById(R.id.text_address);
                 detTitle.setText("Address :  " + detAddress);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -112,7 +121,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "Pressing Back!!!");
+        //Log.d(TAG, "Pressing Back!!!");
         super.onBackPressed();
     }
 
@@ -125,30 +134,24 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.d(TAG, "beforetextchange");
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Log.d(TAG, "on text change");
         }
 
         @Override
         public void afterTextChanged(final Editable s) {
-            Log.d(TAG, "aftertextchange");
 
             if (!initialCountdown) {
                 triggerCountdown.cancel();
             }
-
             triggerCountdown = new CountDownTimer(2000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                 }
-
                 @Override
                 public void onFinish() {
-
                     ContentValues cv = new ContentValues();
                     switch (watcherView.getId()) {
                         case R.id.buoy_description:
@@ -160,14 +163,12 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                     }
                     if (cv.size() > 0) {
                         db.update("buoyslist", cv, "_ID=?", new String[]{detailIndex});
-                        Log.d(TAG, "DATABASE SAVE!");
+                        //Log.d(TAG, "DATABASE SAVE!");
                     }
-
                 }
             };
             triggerCountdown.start();
             initialCountdown = false;
-
         }
     }
 }

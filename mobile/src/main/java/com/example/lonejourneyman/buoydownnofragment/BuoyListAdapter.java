@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by lonejourneyman on 3/31/17.
  */
@@ -30,7 +33,6 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
 
     public BuoyListAdapter(Context context) {
         this.mContext = context;
-        //this.mListener = listener;
     }
 
     @Override
@@ -68,9 +70,6 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
             e.printStackTrace();
         }
 
-        //holder.buoyDate.setText(timeStamp);
-        //holder.buoyDate.setVisibility(View.GONE);
-
         holder.buoyIndex.setText(String.valueOf(id));
         holder.buoyDescriptionView.setText(description);
         holder.buoyDetailsView.setText(details);
@@ -100,40 +99,28 @@ public class BuoyListAdapter extends RecyclerView.Adapter<BuoyListAdapter.BuoyLi
     }
 
     class BuoyListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        TextView buoyIndex;
-        TextView buoyDate;
-        TextView buoyDescriptionView;
-        TextView buoyDetailsView;
-        TextView buoyLongTextView;
-        TextView buoyLatTextView;
+        @BindView(R.id.database_index) TextView buoyIndex;
+        @BindView(R.id.buoy_date) TextView buoyDate;
+        @BindView(R.id.buoy_description) TextView buoyDescriptionView;
+        @BindView(R.id.database_details) TextView buoyDetailsView;
+        @BindView(R.id.buoy_longitude) TextView buoyLongTextView ;
+        @BindView(R.id.buoy_latitude) TextView buoyLatTextView;
 
         public BuoyListHolder(View itemView) {
             super(itemView);
-
             itemView.setOnClickListener(this);
-
-            buoyIndex = (TextView) itemView.findViewById(R.id.database_index);
-            buoyDate = (TextView) itemView.findViewById(R.id.buoy_date);
-            buoyDescriptionView = (TextView) itemView.findViewById(R.id.buoy_description);
-            buoyDetailsView = (TextView) itemView.findViewById(R.id.database_details);
-            buoyLongTextView = (TextView) itemView.findViewById(R.id.buoy_longitude);
-            buoyLatTextView = (TextView) itemView.findViewById(R.id.buoy_latitude);
+            ButterKnife.bind(this, itemView);
         }
 
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "click : " + getAdapterPosition() + " "
-                    + buoyDescriptionView.getText().toString() + " "
-                    + buoyLongTextView.getText().toString() + " "
-                    + buoyLatTextView.getText().toString());
-
             Intent detailIntent = new Intent(mContext, DetailActivity.class);
             detailIntent.putExtra("DatabaseIndex", buoyIndex.getText().toString());
             detailIntent.putExtra("Description", buoyDescriptionView.getText().toString());
             detailIntent.putExtra("DatabaseDetails", buoyDetailsView.getText().toString());
             detailIntent.putExtra("Longitude", buoyLongTextView.getText().toString());
             detailIntent.putExtra("Latitude", buoyLatTextView.getText().toString());
+            detailIntent.putExtra("Date", buoyDate.getText().toString());
             mContext.startActivity(detailIntent);
         }
     }
