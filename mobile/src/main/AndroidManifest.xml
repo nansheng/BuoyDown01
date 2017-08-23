@@ -55,10 +55,10 @@
 
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
-            android:value="AIzaSyCUC1JkAJgB11HXNIh9qcMUxamk5_dt4DE" />
+            android:value="" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC3VdtiYkgndcM0DFr0qgCBk2lahaIjjHk" />
+            android:value="" />
 
         <meta-data
             android:name="com.google.android.gms.car.application"
